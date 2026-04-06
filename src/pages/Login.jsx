@@ -1,96 +1,222 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabaseClient'   // signUp / signIn
+import { supabase } from '../lib/supabaseClient'
 
-
-// //sign up
-// supabase.auth.signUp({email, password})
-
-
-// //sign in
-// supabase.auth.signInWithPassword({email, password})
-
-// //google OAuth
-// supabase.auth.signInWithOAuth({provider: 'google'})
-
+const inputStyle = {
+  width: '100%',
+  background: '#fff',
+  border: '1.5px solid #EDE5DC',
+  borderRadius: '12px',
+  padding: '14px 16px',
+  fontSize: '15px',
+  color: '#2A1F2D',
+  outline: 'none',
+  fontFamily: 'DM Sans, system-ui, sans-serif',
+  boxSizing: 'border-box',
+  display: 'block',
+  marginTop: '6px',
+}
 
 const Login = () => {
-    const navigate = useNavigate()
-    const [mode, setMode] = useState('login')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [error, setError] = useState('')
-    const [loading, setLoading] = useState(false)
-    const [success, setSuccess] = useState('')
+  const navigate = useNavigate()
+  const [mode, setMode] = useState('login')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState('')
 
-
-    const handleSubmit = async() => {
-        setError(''); setLoading(true)
-        try {
-            if (mode === 'signup') {
-                const {error} = await supabase.auth.signUp({email, password})
-                if (error) throw error
-                setSuccess('Check your email to confirm your account!')
-            } else {
-                const {error} = await supabase.auth.signInWithPassword({email, password})
-                if (error) throw error
-                navigate('/')
-            }
-        } catch (err) {setError(err.message)} finally { setLoading(false)}
+  const handleSubmit = async () => {
+    if (!email || !password) { setError('Please fill in all fields'); return }
+    setError('')
+    setLoading(true)
+    try {
+      if (mode === 'signup') {
+        const { error } = await supabase.auth.signUp({ email, password })
+        if (error) throw error
+        setSuccess('Check your email to confirm your account!')
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) throw error
+        navigate('/home')
+      }
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    return (
-        <div className="bg-cream min-h-screen flex items-start justify-center pt-14 px-4">
-            <div className="w-full max-w-sm">
-                <div className="text-center mb-8">
-                <div className="font-serif font-bold text-4xl text-ink mb-2">
-                    hobby<span className="text-rose-deep">find</span>
-                </div>
-                <p className="text-sm text-muted">{mode === 'login' ? 'Welcome back' : 'Create your account'}</p>
-                </div>
+  return (
+    <div style={{ background: '#FAF7F4', minHeight: '100vh', fontFamily: 'DM Sans, system-ui, sans-serif' }}>
 
-                {success ? (
-                <div className="bg-sage-light border border-sage rounded-xl p-4 text-sage-deep text-sm text-center">{success}</div>
-                ) : (
-                <>
-                    {error && <div className="bg-rose-light border border-rose rounded-xl p-3 text-rose-dark text-sm mb-4">{error}</div>}
-
-                    <div className="space-y-3 mb-4">
-                    <div className="bg-white border border-surface2 rounded-xl flex items-center gap-2 px-4 py-3">
-                        <span className="text-muted text-sm">✉</span>
-                        <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)}
-                        className="bg-transparent border-none outline-none text-ink text-sm flex-1 placeholder-muted/60 font-sans" />
-                    </div>
-                    <div className="bg-white border border-surface2 rounded-xl flex items-center gap-2 px-4 py-3">
-                        <span className="text-muted text-sm">🔒</span>
-                        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
-                        className="bg-transparent border-none outline-none text-ink text-sm flex-1 placeholder-muted/60 font-sans" />
-                    </div>
-                    </div>
-
-                    <button onClick={handleSubmit} disabled={loading}
-                    className="w-full bg-rose-deep hover:bg-rose-dark text-white font-semibold py-3.5 rounded-xl text-sm transition-colors mb-3 disabled:opacity-50">
-                    {loading ? 'Please wait...' : mode === 'login' ? 'Sign in' : 'Create account'}
-                    </button>
-
-                    <div className="text-center text-muted text-xs mb-3">or</div>
-
-                    <button onClick={() => supabase.auth.signInWithOAuth({ provider: 'google' })}
-                    className="w-full bg-white border border-surface2 hover:border-rose rounded-xl py-3 text-sm text-ink2 transition-colors mb-6 font-sans">
-                    G&nbsp;&nbsp;Continue with Google
-                    </button>
-
-                    <div className="text-center text-xs text-muted">
-                    {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-                    <button onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-rose-deep hover:text-rose-dark font-medium">
-                        {mode === 'login' ? 'Sign up' : 'Sign in'}
-                    </button>
-                    </div>
-                </>
-                )}
-            </div>
+      {/* Header */}
+      <div style={{
+        background: '#F9ECF1',
+        padding: '52px 24px 36px',
+        textAlign: 'center',
+        borderBottom: '1px solid #F0E0E8',
+      }}>
+        <div style={{
+          fontFamily: 'Playfair Display, Georgia, serif',
+          fontWeight: 700,
+          fontSize: '40px',
+          color: '#2A1F2D',
+          letterSpacing: '-.02em',
+          marginBottom: '8px',
+        }}>
+          hobby<span style={{ color: '#C96E8A' }}>find</span>
         </div>
-        
-    )
+        <div style={{ fontSize: '15px', color: '#7A6880', fontWeight: 400 }}>
+          {mode === 'login' ? 'Welcome back 👋' : 'Create your account ✨'}
+        </div>
+      </div>
+
+      {/* Form */}
+      <div style={{ padding: '32px 24px', maxWidth: '440px', margin: '0 auto' }}>
+
+        {success ? (
+          <div style={{
+            background: '#DCF0E2', border: '1px solid #A8C4B0',
+            borderRadius: '16px', padding: '24px',
+            textAlign: 'center',
+          }}>
+            <div style={{ fontSize: '36px', marginBottom: '10px' }}>✉️</div>
+            <div style={{ fontSize: '16px', fontWeight: 600, color: '#5A8C6A', marginBottom: '6px' }}>
+              Check your inbox
+            </div>
+            <div style={{ fontSize: '14px', color: '#5A8C6A' }}>{success}</div>
+          </div>
+        ) : (
+          <>
+            {error && (
+              <div style={{
+                background: '#FEF0F3',
+                border: '1.5px solid #F0C0C8',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                fontSize: '14px',
+                color: '#C96E8A',
+                marginBottom: '20px',
+                fontWeight: 500,
+              }}>
+                {error}
+              </div>
+            )}
+
+            {/* Email field */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{
+                fontSize: '12px', fontWeight: 600,
+                color: '#4A3850', letterSpacing: '.06em',
+                textTransform: 'uppercase', display: 'block',
+              }}>
+                Email address
+              </label>
+              <input
+                type="email"
+                placeholder="you@email.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+                onFocus={e => e.target.style.borderColor = '#C96E8A'}
+                onBlur={e => e.target.style.borderColor = '#EDE5DC'}
+                style={inputStyle}
+              />
+            </div>
+
+            {/* Password field */}
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{
+                fontSize: '12px', fontWeight: 600,
+                color: '#4A3850', letterSpacing: '.06em',
+                textTransform: 'uppercase', display: 'block',
+              }}>
+                Password
+              </label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+                onFocus={e => e.target.style.borderColor = '#C96E8A'}
+                onBlur={e => e.target.style.borderColor = '#EDE5DC'}
+                style={inputStyle}
+              />
+            </div>
+
+            {/* Submit button */}
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              style={{
+                width: '100%',
+                background: '#C96E8A',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '14px',
+                padding: '16px',
+                fontSize: '16px',
+                fontWeight: 600,
+                cursor: loading ? 'default' : 'pointer',
+                fontFamily: 'DM Sans, system-ui, sans-serif',
+                marginBottom: '20px',
+                opacity: loading ? 0.7 : 1,
+                letterSpacing: '.01em',
+              }}
+            >
+              {loading ? 'Please wait...' : mode === 'login' ? 'Sign in' : 'Create account'}
+            </button>
+
+            {/* Divider */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px' }}>
+              <div style={{ flex: 1, height: '1px', background: '#EDE5DC' }} />
+              <span style={{ fontSize: '13px', color: '#B07090' }}>or</span>
+              <div style={{ flex: 1, height: '1px', background: '#EDE5DC' }} />
+            </div>
+
+            {/* Google button */}
+            <button
+              onClick={() => supabase.auth.signInWithOAuth({ provider: 'google' })}
+              style={{
+                width: '100%',
+                background: '#fff',
+                border: '1.5px solid #EDE5DC',
+                borderRadius: '14px',
+                padding: '14px',
+                fontSize: '15px',
+                color: '#2A1F2D',
+                cursor: 'pointer',
+                fontFamily: 'DM Sans, system-ui, sans-serif',
+                marginBottom: '28px',
+                fontWeight: 500,
+              }}
+            >
+              🔍 &nbsp;Continue with Google
+            </button>
+
+            {/* Switch mode */}
+            <div style={{ textAlign: 'center', fontSize: '14px', color: '#7A6880' }}>
+              {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+              <span
+                onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError('') }}
+                style={{
+                  color: '#C96E8A',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  textDecorationColor: 'rgba(201,110,138,0.3)',
+                }}
+              >
+                {mode === 'login' ? 'Sign up free' : 'Sign in'}
+              </span>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
 }
+
 export default Login

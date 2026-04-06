@@ -19,7 +19,7 @@ const TabBar = () => {
   const location = useLocation()
   if (['/', '/login'].includes(location.pathname)) return null
   return (
-    <div style={{ display: 'flex', background: '#fff', borderTop: '1px solid #F7D6E3' }}>
+   <div style={{ display: 'flex', background: '#fff', borderTop: '1px solid #F7D6E3', width: '100%' }}>
       {tabs.map((t) => (
         <NavLink key={t.to} to={t.to}
           style={({ isActive }) => ({
@@ -40,7 +40,7 @@ const Layout = () => {
   const location = useLocation()
   const hideNav = ['/', '/login'].includes(location.pathname)
   return (
-    <div style={{ background: '#FAF7F4', minHeight: '100vh', display: 'flex', flexDirection: 'column', maxWidth: '448px', margin: '0 auto' }}>
+  <div style={{ background: '#FAF7F4', minHeight: '100vh', display: 'flex', flexDirection: 'column', width: '100%' }}>
       {!hideNav && <Navbar />}
       <div style={{ flex: 1, overflowY: 'auto' }}>
         <Routes>
