@@ -1,12 +1,12 @@
 const TM_KEY = import.meta.env.VITE_TM_KEY
 const BASE_URL = 'https://app.ticketmaster.com/discovery/v2'
 
-export const fetchEvents = async (lat, lng, category = '') => {
+export const fetchEvents = async (lat, lng, category = '', radius = 10) => {
   try {
     const params = new URLSearchParams({
       apikey: TM_KEY,
       latlong: `${lat},${lng}`,
-      radius: '25',
+      radius: String(radius),
       unit: 'miles',
       size: '20',
       sort: 'date,asc',

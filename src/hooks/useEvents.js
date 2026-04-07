@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { fetchEvents } from '../services/ticketmasterService'
 import { fetchActivities } from '../services/yelpService'
 
-// Maps our UI category names to Ticketmaster classification names
 const TM_CATEGORY_MAP = {
   'Music':    'Music',
   'Art':      'Arts & Theatre',
@@ -13,7 +12,6 @@ const TM_CATEGORY_MAP = {
   'Outdoors': 'Miscellaneous',
 }
 
-// Maps our UI category names to Yelp search terms
 const YELP_TERM_MAP = {
   'Music':    'music classes concerts',
   'Art':      'art classes painting drawing',
@@ -24,39 +22,40 @@ const YELP_TERM_MAP = {
   'All':      'classes activities events',
 }
 
-const useEvents = (location, category = '') => {
+const normalizeCategory = (cat) => {
+  if (!cat) return 'Event'
+  if (cat.includes('Arts') || cat.includes('Theatre')) return 'Art'
+  if (cat === 'Sports') return 'Fitness'
+  return cat
+}
+
+const useEvents = (location, category = '', radius = 10) => {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
   useEffect(() => {
     if (!location) return
+
     const load = async () => {
       setLoading(true)
       setError(null)
       try {
         const tmCategory = category ? (TM_CATEGORY_MAP[category] ?? category) : ''
-        const yelpTerm = category ? (YELP_TERM_MAP[category] ?? category + ' classes') : 'classes activities'
+        const yelpTerm = category
+          ? (YELP_TERM_MAP[category] ?? category + ' classes')
+          : 'classes activities'
 
         const [tmEvents, yelpEvents] = await Promise.all([
-          fetchEvents(location.lat, location.lng, tmCategory),
+          fetchEvents(location.lat, location.lng, tmCategory, radius),
           fetchActivities(location.lat, location.lng, yelpTerm),
         ])
 
-        // Normalize category names back to our UI names
-        const normalizeCategory = (cat) => {
-          if (!cat) return 'Event'
-          if (cat.includes('Arts') || cat.includes('Theatre')) return 'Art'
-          if (cat === 'Sports') return 'Fitness'
-          return cat
-        }
-
         const normalized = [...tmEvents, ...yelpEvents].map(e => ({
           ...e,
-          category: normalizeCategory(e.category)
+          category: normalizeCategory(e.category),
         }))
 
-        // Sort by date then filter out events with no location
         const sorted = normalized
           .filter(e => e.lat && e.lng)
           .sort((a, b) => (a.date || '').localeCompare(b.date || ''))
@@ -69,8 +68,9 @@ const useEvents = (location, category = '') => {
         setLoading(false)
       }
     }
+
     load()
-  }, [location, category])
+  }, [location, category, radius])
 
   return { events, loading, error }
 }
