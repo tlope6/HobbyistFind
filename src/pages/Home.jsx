@@ -39,7 +39,7 @@ const fmtDate = (d) => {
 }
 
 const Home = () => {
-  const { location, setLocation, setCityName, activeCategory, setActiveCategory, radius } = useAppContext()
+  const { location, setLocation, setCityName, activeCategory, setActiveCategory, radius, setRadius } = useAppContext()
   const { location: detected, loading: locLoading } = useLocation()
   const { events, loading } = useEvents(location, activeCategory === 'All' ? '' : activeCategory, radius)
   const navigate = useNavigate()
@@ -53,6 +53,7 @@ const Home = () => {
   const [panelFull, setPanelFull] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
+  const [showRadius, setShowRadius] = useState(false)
 
   const filteredEvents = events.filter(e => {
     if (!searchQuery) return true
@@ -252,6 +253,54 @@ const Home = () => {
             )
           })}
         </div>
+      </div>
+
+      {/* Radius control */}
+      <div style={{ position: 'absolute', top: '120px', right: '14px', zIndex: 9 }}>
+        <button
+          onClick={() => setShowRadius(!showRadius)}
+          style={{
+            background: 'rgba(255,255,255,0.95)', border: 'none',
+            borderRadius: '20px', padding: '6px 14px',
+            fontSize: '12px', fontWeight: 600, color: '#4A3850',
+            cursor: 'pointer', boxShadow: '0 2px 8px rgba(42,31,45,0.12)',
+            fontFamily: 'DM Sans, system-ui, sans-serif',
+            display: 'flex', alignItems: 'center', gap: '5px'
+          }}
+        >
+          📍 {radius} mi
+        </button>
+
+        {showRadius && (
+          <div style={{
+            position: 'absolute', top: '36px', right: 0,
+            background: '#fff', borderRadius: '14px', padding: '16px',
+            boxShadow: '0 4px 20px rgba(42,31,45,0.15)', width: '220px', zIndex: 20
+          }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#2A1F2D', marginBottom: '12px' }}>Search radius</div>
+            <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+              {[5, 10, 25, 50].map(r => (
+                <button key={r} onClick={() => { setRadius(r); setShowRadius(false) }} style={{
+                  flex: 1, padding: '5px 0', borderRadius: '20px', fontSize: '11px',
+                  fontWeight: 600, cursor: 'pointer', border: '1.5px solid',
+                  background: radius === r ? '#C96E8A' : 'transparent',
+                  borderColor: radius === r ? '#C96E8A' : '#EDE5DC',
+                  color: radius === r ? '#fff' : '#4A3850',
+                  fontFamily: 'DM Sans, system-ui, sans-serif'
+                }}>{r} mi</button>
+              ))}
+            </div>
+            <input type="range" min="1" max="100" step="1" value={radius}
+              onChange={e => setRadius(Number(e.target.value))}
+              style={{ width: '100%', accentColor: '#C96E8A' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#7A6880', marginTop: '4px' }}>
+              <span>1 mi</span>
+              <span style={{ fontWeight: 700, color: '#C96E8A' }}>{radius} mi</span>
+              <span>100 mi</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* View events floating button */}
