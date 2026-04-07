@@ -8,12 +8,11 @@ import Events from './pages/Events'
 import Hobbies from './pages/Hobbies'
 import Profile from './pages/Profile'
 import Login from './pages/Login'
-import Search from './pages/Search'
+
 
 const TabBar = () => {
   const tabs = [
     { to: '/home', icon: '🗺', label: 'Map' },
-    { to: '/search', icon: '🔍', label: 'Search'},
     { to: '/events', icon: '📋', label: 'Events' },
     { to: '/hobbies', icon: '✨', label: 'New Hobby' },
     { to: '/profile', icon: '👤', label: 'Account' },
@@ -48,7 +47,6 @@ const Layout = () => {
         <Routes>
           <Route path="/" element={<Intro />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/search" element={<Search />} />
           <Route path="/events" element={<Events />} />
           <Route path="/hobbies" element={<Hobbies />} />
           <Route path="/login" element={<Login />} />

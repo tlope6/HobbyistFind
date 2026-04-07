@@ -11,7 +11,6 @@ export const fetchEvents = async (lat, lng, category = '', radius = 10) => {
       size: '20',
       sort: 'date,asc',
     })
-
     if (category) params.append('classificationName', category)
 
     const res = await fetch(`${BASE_URL}/events.json?${params}`)
@@ -21,6 +20,28 @@ export const fetchEvents = async (lat, lng, category = '', radius = 10) => {
 
     return events.map((e) => {
       const venue = e._embedded?.venues?.[0]
+
+      // Accurate price detection
+      let price = 'Free'
+      if (e.priceRanges && e.priceRanges.length > 0) {
+        const min = e.priceRanges[0].min
+        const max = e.priceRanges[0].max
+        if (min === 0 && (!max || max === 0)) {
+          price = 'Free'
+        } else if (min === 0 && max > 0) {
+          price = `Free–$${Math.round(max)}`
+        } else if (min > 0) {
+          price = min === max
+            ? `$${Math.round(min)}`
+            : `$${Math.round(min)}–$${Math.round(max)}`
+        }
+      } else if (e.pleaseNote?.toLowerCase().includes('free')) {
+        price = 'Free'
+      } else {
+        // No price info — mark as unknown not Free
+        price = 'See site'
+      }
+
       return {
         id: e.id,
         source: 'ticketmaster',
@@ -34,12 +55,11 @@ export const fetchEvents = async (lat, lng, category = '', radius = 10) => {
         city: venue?.city?.name ?? '',
         lat: parseFloat(venue?.location?.latitude ?? lat),
         lng: parseFloat(venue?.location?.longitude ?? lng),
-        price: e.priceRanges?.[0]?.min
-          ? `$${Math.round(e.priceRanges[0].min)}`
-          : 'Free',
+        price,
         url: e.url ?? '',
         image: e.images?.find(img => img.ratio === '16_9' && img.width > 500)?.url
           ?? e.images?.[0]?.url ?? '',
+        priceMin: e.priceRanges?.[0]?.min ?? null,
       }
     })
   } catch (err) {
