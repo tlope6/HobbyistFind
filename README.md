@@ -26,13 +26,6 @@ HobbyFind is a location-based hobby discovery app that connects people with loca
 - **Authentication** — Sign up with email or Google via Supabase Auth.
 - **Responsive** — Works on desktop, tablet, and mobile.
 
----
-
-## Screenshots
-
-| Intro | Map | Events | Profile |
-|-------|-----|--------|---------|
-| Paper airplane animation landing on a map pin | Interactive map with radius control | Searchable event list with ratings | Profile with saved events and hobbies |
 
 ---
 
