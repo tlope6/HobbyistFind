@@ -11,7 +11,7 @@
 
 ## What is HobbyFind?
 
-HobbyFind is a location-based hobby discovery app that connects people with local events, workshops, and activities in their area. Whether you want to pick up painting, join a running club, find a cooking class, or try something completely new — HobbyFind makes it easy to explore and sign up same day.
+HobbyFind is a location-based hobby discovery app that connects people with local events, workshops, and activities in their area. Whether you want to pick up painting, join a running club, find a cooking class, or try something completely new, HobbyFind makes it easy to explore and sign up same day.
 
 ---
 
