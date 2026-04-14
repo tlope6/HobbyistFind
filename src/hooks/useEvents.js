@@ -1,31 +1,41 @@
 import { useState, useEffect } from 'react'
 import { fetchEvents } from '../services/ticketmasterService'
-import { fetchActivities } from '../services/yelpService'
+import { fetchEventbriteEvents } from '../services/eventbriteService'
 
 const TM_CATEGORY_MAP = {
   'Music':    'Music',
   'Art':      'Arts & Theatre',
   'Fitness':  'Sports',
-  'Sports':   'Sports',
-  'Cooking':  'Miscellaneous',
-  'Tech':     'Miscellaneous',
-  'Outdoors': 'Miscellaneous',
+  'Outdoors': 'Sports',
 }
 
-const YELP_TERM_MAP = {
-  'Music':    'music classes concerts',
-  'Art':      'art classes painting drawing',
-  'Fitness':  'fitness gym yoga pilates',
-  'Cooking':  'cooking classes culinary',
-  'Tech':     'coding bootcamp tech classes',
-  'Outdoors': 'hiking outdoor activities parks nature',
-  'All':      'classes activities events',
+const EB_CATEGORY_MAP = {
+  'Art':      '105',
+  'Music':    '103',
+  'Fitness':  '113',
+  'Cooking':  '110',
+  'Tech':     '102',
+  'Outdoors': '111',
+  '':         '',
+}
+
+const EB_KEYWORD_MAP = {
+  'Art':      'art class painting watercolor drawing pottery craft workshop',
+  'Music':    'music class concert performance workshop',
+  'Fitness':  'yoga pilates fitness workout dance class',
+  'Cooking':  'cooking class baking culinary food workshop',
+  'Tech':     'coding workshop hackathon tech class programming',
+  'Outdoors': 'hiking outdoor nature adventure walk tour',
+  '':         'class workshop activity hobby',
 }
 
 const normalizeCategory = (cat) => {
   if (!cat) return 'Event'
   if (cat.includes('Arts') || cat.includes('Theatre')) return 'Art'
   if (cat === 'Sports') return 'Fitness'
+  if (cat.includes('Food') || cat.includes('Drink')) return 'Cooking'
+  if (cat.includes('Tech') || cat.includes('Science')) return 'Tech'
+  if (cat.includes('Outdoor') || cat.includes('Travel')) return 'Outdoors'
   return cat
 }
 
@@ -41,38 +51,45 @@ const useEvents = (location, category = '', radius = 10) => {
       setLoading(true)
       setError(null)
       try {
-        const tmCategory = category ? (TM_CATEGORY_MAP[category] ?? category) : ''
-        const yelpTerm = category
-          ? (YELP_TERM_MAP[category] ?? category + ' classes')
-          : 'classes activities'
+        const tmCategory = TM_CATEGORY_MAP[category] ?? ''
+        const ebCategory = EB_CATEGORY_MAP[category] ?? ''
+        const ebKeyword = EB_KEYWORD_MAP[category] ?? EB_KEYWORD_MAP['']
 
-        const [tmEvents, yelpEvents] = await Promise.all([
-          fetchEvents(location.lat, location.lng, tmCategory, radius),
-          fetchActivities(location.lat, location.lng, yelpTerm),
+        const shouldUseTM = ['Music', 'Art', 'Fitness', ''].includes(category)
+
+        const [tmEvents, ebEvents] = await Promise.all([
+          shouldUseTM
+            ? fetchEvents(location.lat, location.lng, tmCategory, radius)
+            : Promise.resolve([]),
+          fetchEventbriteEvents(location.lat, location.lng, ebCategory, ebKeyword, radius),
         ])
 
-        const normalized = [...tmEvents, ...yelpEvents].map(e => ({
-          ...e,
-          category: normalizeCategory(e.category),
-        }))
+        const allEvents = [...tmEvents, ...ebEvents]
 
-        const sorted = normalized
-          .filter(e => e.lat && e.lng)
-          .sort((a, b) => (a.date || '').localeCompare(b.date || ''))
-
-        setEvents(sorted)
-      } catch (err) {
-        setError('Could not load events.')
-        console.error(err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    load()
-  }, [location, category, radius])
-
-  return { events, loading, error }
-}
-
-export default useEvents
+        const seen = new Set()
+                const normalized = allEvents
+                  .map(e => ({ ...e, category: normalizeCategory(e.category) }))
+                  .filter(e => {
+                    if (!e.lat || !e.lng) return false
+                    const key = e.title?.toLowerCase().trim()
+                    if (!key || seen.has(key)) return false
+                    seen.add(key)
+                    return true
+                  })
+                  .sort((a, b) => (a.date || '').localeCompare(b.date || ''))
+        
+                setEvents(normalized)
+              } catch (err) {
+                setError(err.message)
+              } finally {
+                setLoading(false)
+              }
+            }
+        
+            load()
+          }, [location, category, radius])
+        
+          return { events, loading, error }
+        }
+        
+        export default useEvents
