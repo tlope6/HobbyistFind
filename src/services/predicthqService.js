@@ -4,7 +4,7 @@ const CATEGORY_MAP = {
   'Music':    'concerts,performing-arts,festivals',
   'Art':      'performing-arts,festivals,community',
   'Fitness':  'sports,community',
-  'Cooking':  'community,expos,festivals',
+  'Cooking':  'community,festivals',
   'Tech':     'conferences,expos',
   'Outdoors': 'sports,community,festivals',
   '':         'concerts,performing-arts,sports,community,conferences,expos,festivals',
