@@ -1,13 +1,13 @@
 const PHQ_KEY = import.meta.env.VITE_PHQ_KEY
 
 const CATEGORY_MAP = {
-  'Music':    'concerts,performing-arts',
-  'Art':      'performing-arts,community',
+  'Music':    'concerts,performing-arts,festivals',
+  'Art':      'performing-arts,festivals,community',
   'Fitness':  'sports,community',
-  'Cooking':  'community',
+  'Cooking':  'community,expos,festivals',
   'Tech':     'conferences,expos',
-  'Outdoors': 'outdoor,community',
-  '':         'concerts,performing-arts,sports,community,conferences,outdoor',
+  'Outdoors': 'sports,community,festivals',
+  '':         'concerts,performing-arts,sports,community,conferences,expos,festivals',
 }
 
 const mapPHQCategory = (cat) => {
@@ -34,14 +34,16 @@ export const fetchPredictHQEvents = async (lat, lng, category = '', radius = 10)
     const categories = CATEGORY_MAP[category] ?? CATEGORY_MAP['']
     const today = new Date().toISOString().split('T')[0]
 
-    const params = new URLSearchParams({
-      'location_around.origin': `${lat},${lng}`,
-      'location_around.offset': `${radius}mi`,
-      'category': categories,
-      'limit': 20,
-      'sort': 'start',
-      'active.gte': today,
-    })
+    const params = new URLSearchParams()
+    params.append('location_around.origin', `${lat},${lng}`)
+    params.append('location_around.offset', `${radius}mi`)
+    params.append('limit', '20')
+    params.append('sort', 'start')
+    params.append('active.gte', today)
+    params.append('category', categories)  // single comma-separated string
+
+    // Add each category as a separate parameter
+    params.append('category', categories)
 
     const res = await fetch(`https://api.predicthq.com/v1/events/?${params}`, {
       headers: {
@@ -61,6 +63,7 @@ export const fetchPredictHQEvents = async (lat, lng, category = '', radius = 10)
 
     return events.map(e => {
       const coords = e.geo?.geometry?.coordinates
+      const venueEntity = e.entities?.find(en => en.type === 'venue')
       return {
         id: `phq-${e.id}`,
         source: 'predicthq',
@@ -68,9 +71,9 @@ export const fetchPredictHQEvents = async (lat, lng, category = '', radius = 10)
         category: mapPHQCategory(e.category),
         date: e.start?.split('T')[0] ?? '',
         time: e.start?.split('T')[1]?.slice(0, 5) ?? '',
-        venue: e.entities?.find(en => en.type === 'venue')?.name ?? '',
-        address: '',
-        city: e.entities?.find(en => en.type === 'venue')?.formatted_address ?? '',
+        venue: venueEntity?.name ?? '',
+        address: venueEntity?.formatted_address ?? '',
+        city: e.location?.[0] ?? '',
         lat: coords ? parseFloat(coords[1]) : lat,
         lng: coords ? parseFloat(coords[0]) : lng,
         price: 'See site',
