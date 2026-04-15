@@ -215,7 +215,7 @@ MIT
 ## Acknowledgements
 
 - [Ticketmaster Discovery API](https://developer.ticketmaster.com) for event data
-- [Yelp Fusion API](https://docs.developer.yelp.com) for local activity data
+- [PredictHQ API](https://www.predicthq.com/) for local activity data
 - [Mapbox](https://mapbox.com) for the interactive map
 - [Supabase](https://supabase.com) for auth and database
 - [Playfair Display](https://fonts.google.com/specimen/Playfair+Display) and [DM Sans](https://fonts.google.com/specimen/DM+Sans) fonts
