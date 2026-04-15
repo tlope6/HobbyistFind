@@ -40,7 +40,7 @@ HobbyFind is a location-based hobby discovery app that connects people with loca
 | Auth | Supabase Auth (email + Google OAuth) |
 | Storage | Supabase Storage (avatar images) |
 | Events API | Ticketmaster Discovery API |
-| Activities API | Yelp Fusion API (via proxy) |
+| Activities API | PredictHQ Fusion API (via proxy) |
 | Deployment | Vercel (frontend) + Railway (backend proxy) |
 
 ---
@@ -54,6 +54,7 @@ HobbyFind is a location-based hobby discovery app that connects people with loca
 - A Supabase account (free)
 - A Mapbox account (free)
 - A Ticketmaster developer account (free)
+- A PredictHQ developer account (free trial)
 
 ### Installation
 
@@ -83,7 +84,7 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_TM_KEY=your-ticketmaster-key
 VITE_MAPBOX_KEY=pk.your-mapbox-key
-VITE_YELP_KEY=your-yelp-key
+VITE_PHQ_KEY=your-yelp-key
 ```
 
 **4. Set up the database**
@@ -128,7 +129,7 @@ hobby-finder/
 │   ├── services/
 │   │   ├── locationService.js       # Browser geolocation wrapper
 │   │   ├── ticketmasterService.js   # Ticketmaster API calls
-│   │   └── yelpService.js           # Yelp proxy calls
+│   │   └── predicthqService.js           # PredictHQ proxy calls
 │   ├── App.jsx                 # Routes and tab bar
 │   ├── main.jsx                # React entry point
 │   └── index.css               # Tailwind + global styles
@@ -170,10 +171,9 @@ hobby-finder/
 1. Register at [developer.ticketmaster.com](https://developer.ticketmaster.com)
 2. Create an app and copy the **Consumer Key**
 
-### Yelp
-1. Register at [docs.developer.yelp.com](https://docs.developer.yelp.com)
+### PredictHQ
+1. Register at [predicthq.com](https://www.predicthq.com/)
 2. Create an app and copy the **API Key**
-3. Note: Yelp requires a backend proxy due to CORS restrictions
 
 ---
 
@@ -186,9 +186,6 @@ hobby-finder/
 3. Add all environment variables
 4. Deploy — auto-deploys on every push
 
-### Backend proxy — Railway
-
-The Yelp API requires a small server proxy due to CORS. Deploy the `server/` folder to [railway.app](https://railway.app) and add `YELP_KEY` as an environment variable.
 
 ---
 
