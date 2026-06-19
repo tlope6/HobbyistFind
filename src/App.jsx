@@ -8,7 +8,8 @@ import Events from './pages/Events'
 import Hobbies from './pages/Hobbies'
 import Profile from './pages/Profile'
 import Login from './pages/Login'
-
+import ChatWidget from './components/ChatWidget'
+import Assistant from './pages/Assistant'
 
 const TabBar = () => {
   const tabs = [
@@ -51,9 +52,11 @@ const Layout = () => {
           <Route path="/hobbies" element={<Hobbies />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/assistant" element={<Assistant />} />
         </Routes>
       </div>
       <TabBar />
+      {!hideNav && <ChatWidget />}
     </div>
   )
 }

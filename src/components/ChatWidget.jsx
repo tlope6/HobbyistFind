@@ -1,5 +1,5 @@
 import {useState, useRef, useEffect} from 'react'
-import {useChatBot, QUICK_REPLIES} from '../hooks/useChatBot'
+import {useChatBot, QUICK_REPLIES} from '../hooks/useChatbot'
 import { useNavigate } from 'react-router-dom'
 
 const ChatWidget = () => {

@@ -1,31 +1,21 @@
 import { useState, useEffect } from 'react'
 import { fetchEvents } from '../services/ticketmasterService'
-import { fetchActivities } from '../services/yelpService'
+import { fetchPredictHQEvents } from '../services/predicthqService'
 
 const TM_CATEGORY_MAP = {
   'Music':    'Music',
   'Art':      'Arts & Theatre',
   'Fitness':  'Sports',
-  'Sports':   'Sports',
-  'Cooking':  'Miscellaneous',
-  'Tech':     'Miscellaneous',
-  'Outdoors': 'Miscellaneous',
-}
-
-const YELP_TERM_MAP = {
-  'Music':    'music classes concerts',
-  'Art':      'art classes painting drawing',
-  'Fitness':  'fitness gym yoga pilates',
-  'Cooking':  'cooking classes culinary',
-  'Tech':     'coding bootcamp tech classes',
-  'Outdoors': 'hiking outdoor activities parks nature',
-  'All':      'classes activities events',
+  'Outdoors': 'Sports',
 }
 
 const normalizeCategory = (cat) => {
   if (!cat) return 'Event'
   if (cat.includes('Arts') || cat.includes('Theatre')) return 'Art'
   if (cat === 'Sports') return 'Fitness'
+  if (cat.includes('Food') || cat.includes('Drink')) return 'Cooking'
+  if (cat.includes('Tech') || cat.includes('Science')) return 'Tech'
+  if (cat.includes('Outdoor') || cat.includes('Travel')) return 'Outdoors'
   return cat
 }
 
@@ -41,29 +31,33 @@ const useEvents = (location, category = '', radius = 10) => {
       setLoading(true)
       setError(null)
       try {
-        const tmCategory = category ? (TM_CATEGORY_MAP[category] ?? category) : ''
-        const yelpTerm = category
-          ? (YELP_TERM_MAP[category] ?? category + ' classes')
-          : 'classes activities'
+        const tmCategory = TM_CATEGORY_MAP[category] ?? ''
+        const shouldUseTM = ['Music', 'Art', 'Fitness', ''].includes(category)
 
-        const [tmEvents, yelpEvents] = await Promise.all([
-          fetchEvents(location.lat, location.lng, tmCategory, radius),
-          fetchActivities(location.lat, location.lng, yelpTerm),
+        const [tmEvents, phqEvents] = await Promise.all([
+          shouldUseTM
+            ? fetchEvents(location.lat, location.lng, tmCategory, radius)
+            : Promise.resolve([]),
+          fetchPredictHQEvents(location.lat, location.lng, category, radius),
         ])
 
-        const normalized = [...tmEvents, ...yelpEvents].map(e => ({
-          ...e,
-          category: normalizeCategory(e.category),
-        }))
+        const allEvents = [...tmEvents, ...phqEvents]
 
-        const sorted = normalized
-          .filter(e => e.lat && e.lng)
+        const seen = new Set()
+        const normalized = allEvents
+          .map(e => ({ ...e, category: normalizeCategory(e.category) }))
+          .filter(e => {
+            if (!e.lat || !e.lng) return false
+            const key = e.title?.toLowerCase().trim()
+            if (!key || seen.has(key)) return false
+            seen.add(key)
+            return true
+          })
           .sort((a, b) => (a.date || '').localeCompare(b.date || ''))
 
-        setEvents(sorted)
+        setEvents(normalized)
       } catch (err) {
-        setError('Could not load events.')
-        console.error(err)
+        setError(err.message)
       } finally {
         setLoading(false)
       }

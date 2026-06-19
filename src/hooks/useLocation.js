@@ -1,12 +1,24 @@
-import { useState, useEffect } from "react";
-import {getUserLocation} from "../services/locationService.js"
+import { useState, useEffect } from "react"
+import { getUserLocation } from "../services/locationService.js"
+
+const FALLBACK_LOCATION = { lat: 41.8781, lng: -87.6298 } // Chicago default
+
 const useLocation = () => {
-    const [location, setLocation] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
-    useEffect(() => {
-        getUserLocation().then(setLocation).catch((err) => {setError(err.message); setLocation(FALLBACK_LOCATION)}).finally(() => setLoading(false))
-    }, [])
-    return {location, loading, error}
+  const [location, setLocation] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    getUserLocation()
+      .then(setLocation)
+      .catch((err) => {
+        setError(err.message)
+        setLocation(FALLBACK_LOCATION)
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  return { location, loading, error }
 }
+
 export default useLocation
