@@ -107,6 +107,7 @@ Open `http://localhost:5173` in your browser.
 hobby-finder/
 ├── src/
 │   ├── components/
+│   │   ├── ChatWidget.js       # Widget that holds the chatbot
 │   │   ├── EventCard.jsx       # Reusable event card with sign up + rating
 │   │   ├── MapView.jsx         # Mapbox map with pins and radius control
 │   │   ├── Navbar.jsx          # Top nav with location chip and avatar
@@ -114,12 +115,14 @@ hobby-finder/
 │   ├── context/
 │   │   └── AppContext.jsx      # Global state (location, category, radius)
 │   ├── hooks/
+│   │   ├── useChatBot.js       # Chabot information
 │   │   ├── useAuth.js          # Supabase auth state
 │   │   ├── useEvents.js        # Fetch + merge events from all APIs
 │   │   └── useLocation.js      # Browser geolocation
 │   ├── lib/
 │   │   └── supabaseClient.js   # Supabase client init
 │   ├── pages/
+│   │   ├── Assistant.js        # Chatbot Page
 │   │   ├── Intro.jsx           # Animated intro screen
 │   │   ├── Home.jsx            # Map + nearby events
 │   │   ├── Events.jsx          # Full event list with search and ratings
