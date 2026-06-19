@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 import useAuth from '../hooks/useAuth'
 import useEvents from '../hooks/useEvents'
 import EventCard from '../components/EventCard'
+import { COLORS, SPACING, RADIUS, FONTS, SHADOW, PAGE_STYLE, SECTION_HEADER_STYLE, pillStyle } from '../theme'
 
 const CATS = ['All', 'Art', 'Music', 'Fitness', 'Cooking', 'Tech', 'Outdoors']
 const FILTERS = ['Today', 'This week', 'Free', 'Beginner friendly']
@@ -38,7 +39,6 @@ const Events = () => {
   const [sortBy, setSortBy] = useState('Date')
   const [showSort, setShowSort] = useState(false)
 
-  // Rating state
   const [ratingEvent, setRatingEvent] = useState(null)
   const [starHover, setStarHover] = useState(0)
   const [starSelected, setStarSelected] = useState(0)
@@ -46,15 +46,9 @@ const Events = () => {
   const [submitting, setSubmitting] = useState(false)
   const [ratingDone, setRatingDone] = useState(false)
 
-  const { events, loading } = useEvents(
-    location,
-    activeCategory === 'All' ? '' : activeCategory,
-    radius
-  )
-
+  const { events, loading } = useEvents(location, activeCategory === 'All' ? '' : activeCategory, radius)
   const today = new Date().toISOString().split('T')[0]
 
-  // Filter + search + sort
   let displayed = events.filter(e => {
     if (activeFilter === 'Today') return e.date === today
     if (activeFilter === 'This week') {
@@ -118,62 +112,61 @@ const Events = () => {
   }
 
   return (
-    <div style={{ background: '#FAF7F4', minHeight: '100vh', fontFamily: 'DM Sans, system-ui, sans-serif', paddingBottom: '100px' }}>
+    <div style={{ ...PAGE_STYLE }}>
 
-      {/* Rating modal overlay */}
+      {/* Rating modal */}
       {ratingEvent && (
         <div style={{
           position: 'fixed', inset: 0, background: 'rgba(42,31,45,0.5)',
           zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center'
         }} onClick={e => { if (e.target === e.currentTarget) closeRating() }}>
           <div style={{
-            background: '#FAF7F4', borderRadius: '24px 24px 0 0',
+            background: COLORS.cream, borderRadius: '24px 24px 0 0',
             padding: '24px 24px 40px', width: '100%', maxWidth: '540px',
             maxHeight: '90vh', overflowY: 'auto'
           }}>
-            {/* Handle bar */}
-            <div style={{ width: '40px', height: '4px', background: '#EDE5DC', borderRadius: '2px', margin: '0 auto 20px' }} />
+            <div style={{ width: '40px', height: '4px', background: COLORS.border, borderRadius: '2px', margin: '0 auto 20px' }} />
 
             {ratingDone ? (
               <div style={{ textAlign: 'center', padding: '20px 0 10px' }}>
-                <div style={{ fontSize: '56px', marginBottom: '14px' }}>🎉</div>
-                <div style={{ fontSize: '22px', fontWeight: 700, color: '#2A1F2D', fontFamily: 'Playfair Display, serif', marginBottom: '8px' }}>
+                <div style={{ fontSize: '56px', marginBottom: SPACING.md }}>🎉</div>
+                <div style={{ fontSize: '22px', fontWeight: 700, color: COLORS.ink, fontFamily: FONTS.heading, marginBottom: SPACING.sm }}>
                   Rating saved!
                 </div>
-                <div style={{ fontSize: '14px', color: '#7A6880', marginBottom: '24px', lineHeight: 1.5 }}>
+                <div style={{ fontSize: '14px', color: COLORS.muted, marginBottom: SPACING.xxl, lineHeight: 1.5 }}>
                   Your review is now visible on your profile. We'll use it to recommend similar events.
                 </div>
                 <button onClick={() => { closeRating(); navigate('/profile') }} style={{
-                  background: '#C96E8A', color: '#fff', border: 'none',
-                  borderRadius: '50px', padding: '12px 28px',
+                  background: COLORS.rose, color: COLORS.white, border: 'none',
+                  borderRadius: RADIUS.pill, padding: '12px 28px',
                   fontSize: '14px', fontWeight: 600, cursor: 'pointer',
-                  fontFamily: 'DM Sans, system-ui, sans-serif', marginRight: '10px'
+                  fontFamily: FONTS.body, marginRight: SPACING.md
                 }}>View in profile</button>
                 <button onClick={closeRating} style={{
-                  background: '#fff', color: '#7A6880',
-                  border: '1px solid #EDE5DC', borderRadius: '50px',
+                  background: COLORS.white, color: COLORS.muted,
+                  border: `1px solid ${COLORS.border}`, borderRadius: RADIUS.pill,
                   padding: '12px 28px', fontSize: '14px', fontWeight: 600,
-                  cursor: 'pointer', fontFamily: 'DM Sans, system-ui, sans-serif'
+                  cursor: 'pointer', fontFamily: FONTS.body
                 }}>Close</button>
               </div>
             ) : (
               <>
-                <div style={{ background: '#F9ECF1', borderRadius: '16px', padding: '16px 20px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{ background: COLORS.roseLight, borderRadius: RADIUS.lg, padding: '16px 20px', marginBottom: SPACING.xxl, display: 'flex', alignItems: 'center', gap: SPACING.md }}>
                   <div style={{ fontSize: '36px' }}>🎫</div>
                   <div>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#C96E8A', letterSpacing: '.06em', marginBottom: '4px' }}>RATING</div>
-                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#2A1F2D', fontFamily: 'Playfair Display, serif', lineHeight: 1.3 }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: COLORS.rose, letterSpacing: '.06em', marginBottom: SPACING.xs }}>RATING</div>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: COLORS.ink, fontFamily: FONTS.heading, lineHeight: 1.3 }}>
                       {ratingEvent.title}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#7A6880', marginTop: '3px' }}>{ratingEvent.category}</div>
+                    <div style={{ fontSize: '12px', color: COLORS.muted, marginTop: '3px' }}>{ratingEvent.category}</div>
                   </div>
                 </div>
 
-                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                  <div style={{ fontSize: '15px', fontWeight: 600, color: '#2A1F2D', marginBottom: '16px' }}>
+                <div style={{ textAlign: 'center', marginBottom: SPACING.xxl }}>
+                  <div style={{ fontSize: '15px', fontWeight: 600, color: COLORS.ink, marginBottom: SPACING.lg }}>
                     How was your experience?
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: SPACING.sm, marginBottom: SPACING.sm }}>
                     {[1, 2, 3, 4, 5].map(star => (
                       <button key={star}
                         onMouseEnter={() => setStarHover(star)}
@@ -189,14 +182,14 @@ const Events = () => {
                     ))}
                   </div>
                   {(starHover || starSelected) > 0 && (
-                    <div style={{ fontSize: '15px', color: '#C96E8A', fontWeight: 600 }}>
+                    <div style={{ fontSize: '15px', color: COLORS.rose, fontWeight: 600 }}>
                       {STAR_LABELS[starHover || starSelected]}
                     </div>
                   )}
                 </div>
 
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#4A3850', letterSpacing: '.06em', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+                <div style={{ marginBottom: SPACING.xl }}>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: COLORS.ink2, letterSpacing: '.06em', textTransform: 'uppercase', display: 'block', marginBottom: SPACING.sm }}>
                     Leave a note (optional)
                   </label>
                   <textarea
@@ -205,24 +198,24 @@ const Events = () => {
                     placeholder="What did you enjoy? Would you try something similar?"
                     rows={3}
                     style={{
-                      width: '100%', background: '#fff',
-                      border: '1.5px solid #EDE5DC', borderRadius: '12px',
-                      padding: '12px 14px', fontSize: '14px', color: '#2A1F2D',
+                      width: '100%', background: COLORS.white,
+                      border: `1.5px solid ${COLORS.border}`, borderRadius: RADIUS.md,
+                      padding: '12px 14px', fontSize: '14px', color: COLORS.ink,
                       outline: 'none', resize: 'none', boxSizing: 'border-box',
-                      fontFamily: 'DM Sans, system-ui, sans-serif',
+                      fontFamily: FONTS.body,
                     }}
-                    onFocus={e => e.target.style.borderColor = '#C96E8A'}
-                    onBlur={e => e.target.style.borderColor = '#EDE5DC'}
+                    onFocus={e => e.target.style.borderColor = COLORS.rose}
+                    onBlur={e => e.target.style.borderColor = COLORS.border}
                   />
                 </div>
 
                 <button onClick={submitRating} disabled={!starSelected || submitting} style={{
-                  width: '100%', background: starSelected ? '#C96E8A' : '#EDE5DC',
-                  color: starSelected ? '#fff' : '#7A6880',
-                  border: 'none', borderRadius: '14px', padding: '16px',
+                  width: '100%', background: starSelected ? COLORS.rose : COLORS.border,
+                  color: starSelected ? COLORS.white : COLORS.muted,
+                  border: 'none', borderRadius: RADIUS.md, padding: SPACING.lg,
                   fontSize: '16px', fontWeight: 600,
                   cursor: starSelected ? 'pointer' : 'default',
-                  fontFamily: 'DM Sans, system-ui, sans-serif', transition: 'all 0.2s'
+                  fontFamily: FONTS.body, transition: 'all 0.2s'
                 }}>
                   {submitting ? 'Saving...' : 'Submit rating'}
                 </button>
@@ -233,10 +226,10 @@ const Events = () => {
       )}
 
       {/* Search bar */}
-      <div style={{ padding: '14px 16px 10px', background: '#fff', borderBottom: '1px solid #F0E8E4', position: 'relative', zIndex: 10 }}>
+      <div style={{ padding: `${SPACING.md} ${SPACING.lg} ${SPACING.sm}`, background: COLORS.white, borderBottom: `1px solid ${COLORS.surface2}`, position: 'relative', zIndex: 10 }}>
         <div style={{
-          background: '#FAF7F4', border: `1.5px solid ${searchFocused ? '#C96E8A' : '#EDE5DC'}`,
-          borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '10px',
+          background: COLORS.cream, border: `1.5px solid ${searchFocused ? COLORS.rose : COLORS.border}`,
+          borderRadius: RADIUS.md, display: 'flex', alignItems: 'center', gap: SPACING.sm,
           padding: '11px 16px', transition: 'border-color 0.15s'
         }}>
           <span style={{ fontSize: '16px', color: '#B07090' }}>🔍</span>
@@ -247,35 +240,26 @@ const Events = () => {
             onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
             style={{
               background: 'transparent', border: 'none', outline: 'none',
-              color: '#2A1F2D', fontSize: '15px', flex: 1,
-              fontFamily: 'DM Sans, system-ui, sans-serif'
+              color: COLORS.ink, fontSize: '15px', flex: 1,
+              fontFamily: FONTS.body
             }}
             placeholder="Search events, venues, categories..."
           />
           {query && (
             <button onClick={() => setQuery('')} style={{
-              background: '#EDE5DC', border: 'none', borderRadius: '50%',
+              background: COLORS.border, border: 'none', borderRadius: '50%',
               width: '22px', height: '22px', cursor: 'pointer', fontSize: '14px',
-              color: '#7A6880', display: 'flex', alignItems: 'center', justifyContent: 'center'
+              color: COLORS.muted, display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>×</button>
           )}
         </div>
 
-        {/* Dropdown suggestions */}
         {query && searchFocused && displayed.length > 0 && (
-          <div style={{
-            position: 'absolute', left: '16px', right: '16px', top: '68px',
-            background: '#fff', border: '1px solid #F0E8E4', borderRadius: '12px',
-            boxShadow: '0 8px 24px rgba(42,31,45,0.12)', zIndex: 50,
-            maxHeight: '240px', overflowY: 'auto'
-          }}>
+          <div style={{ background: COLORS.white, border: `1px solid ${COLORS.surface2}`, borderRadius: RADIUS.md, boxShadow: SHADOW.float, zIndex: 50, maxHeight: '240px', overflowY: 'auto', position: 'absolute', left: SPACING.lg, right: SPACING.lg, top: '68px' }}>
             {displayed.slice(0, 5).map(e => (
               <div key={`${e.source}-${e.id}`}
                 onMouseDown={() => { setQuery(e.title); setSearchFocused(false) }}
-                style={{
-                  padding: '10px 14px', cursor: 'pointer', display: 'flex',
-                  alignItems: 'center', gap: '10px', borderBottom: '1px solid #FAF7F4'
-                }}
+                style={{ padding: '10px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: SPACING.sm, borderBottom: '1px solid #FAF7F4' }}
                 onMouseEnter={el => el.currentTarget.style.background = '#FAF7F4'}
                 onMouseLeave={el => el.currentTarget.style.background = 'transparent'}
               >
@@ -283,10 +267,10 @@ const Events = () => {
                   {e.category === 'Music' ? '🎸' : e.category === 'Art' ? '🎨' : e.category === 'Fitness' ? '🏃' : e.category === 'Cooking' ? '🍳' : e.category === 'Tech' ? '💻' : e.category === 'Outdoors' ? '🏕' : '📅'}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#2A1F2D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.title}</div>
-                  <div style={{ fontSize: '11px', color: '#7A6880' }}>{e.category}{e.venue ? ` · ${e.venue}` : ''}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: COLORS.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.title}</div>
+                  <div style={{ fontSize: '11px', color: COLORS.muted }}>{e.category}{e.venue ? ` · ${e.venue}` : ''}</div>
                 </div>
-                <span style={{ fontSize: '12px', fontWeight: 600, color: e.price === 'Free' ? '#5A8C6A' : '#2A1F2D', flexShrink: 0 }}>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: e.price === 'Free' ? COLORS.sage : COLORS.ink, flexShrink: 0 }}>
                   {e.price === 'Free' ? '✓ Free' : e.price}
                 </span>
               </div>
@@ -296,40 +280,35 @@ const Events = () => {
       </div>
 
       {/* Category pills */}
-      <div style={{ display: 'flex', gap: '8px', padding: '10px 16px 8px', overflowX: 'auto', background: '#fff' }}>
+      <div style={{ display: 'flex', gap: SPACING.sm, padding: `${SPACING.sm} ${SPACING.lg} ${SPACING.sm}`, overflowX: 'auto', background: COLORS.white }}>
         {CATS.map(cat => {
           const active = activeCategory === cat || (cat === 'All' && !activeCategory)
           return (
-            <button key={cat} onClick={() => { setActiveCategory(cat); setQuery('') }} style={{
-              flexShrink: 0, padding: '6px 16px', borderRadius: '20px',
-              fontSize: '13px', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap',
-              border: `1.5px solid ${active ? '#C96E8A' : '#EDE5DC'}`,
-              background: active ? '#C96E8A' : 'transparent',
-              color: active ? '#fff' : '#4A3850',
-              fontFamily: 'DM Sans, system-ui, sans-serif'
-            }}>{cat}</button>
+            <button key={cat} onClick={() => { setActiveCategory(cat); setQuery('') }} style={pillStyle(active)}>
+              {cat}
+            </button>
           )
         })}
       </div>
 
       {/* Quick filters + sort */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px 12px', overflowX: 'auto', background: '#fff', borderBottom: '1px solid #F0E8E4' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: SPACING.sm, padding: `${SPACING.sm} ${SPACING.lg} ${SPACING.md}`, overflowX: 'auto', background: COLORS.white, borderBottom: `1px solid ${COLORS.surface2}` }}>
         {FILTERS.map(f => (
           <button key={f} onClick={() => setActiveFilter(activeFilter === f ? '' : f)} style={{
-            flexShrink: 0, padding: '5px 14px', borderRadius: '20px',
+            flexShrink: 0, padding: '5px 14px', borderRadius: RADIUS.pill,
             fontSize: '12px', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap',
-            border: `1px solid ${activeFilter === f ? '#8B72C8' : '#EDE5DC'}`,
-            background: activeFilter === f ? '#8B72C8' : 'transparent',
-            color: activeFilter === f ? '#fff' : '#7A6880',
-            fontFamily: 'DM Sans, system-ui, sans-serif'
+            border: `1px solid ${activeFilter === f ? COLORS.lavender : COLORS.border}`,
+            background: activeFilter === f ? COLORS.lavender : 'transparent',
+            color: activeFilter === f ? COLORS.white : COLORS.muted,
+            fontFamily: FONTS.body
           }}>{f}</button>
         ))}
         <div style={{ marginLeft: 'auto', position: 'relative', flexShrink: 0 }}>
           <button onClick={() => setShowSort(!showSort)} style={{
-            padding: '5px 14px', borderRadius: '20px', fontSize: '12px',
-            fontWeight: 500, cursor: 'pointer', border: '1px solid #EDE5DC',
-            background: '#fff', color: '#4A3850',
-            fontFamily: 'DM Sans, system-ui, sans-serif',
+            padding: '5px 14px', borderRadius: RADIUS.pill, fontSize: '12px',
+            fontWeight: 500, cursor: 'pointer', border: `1px solid ${COLORS.border}`,
+            background: COLORS.white, color: COLORS.ink2,
+            fontFamily: FONTS.body,
             display: 'flex', alignItems: 'center', gap: '4px'
           }}>
             ↕ {sortBy}
@@ -337,18 +316,18 @@ const Events = () => {
           {showSort && (
             <div style={{
               position: 'absolute', right: 0, top: '34px',
-              background: '#fff', border: '1px solid #F0E8E4',
-              borderRadius: '10px', zIndex: 20,
-              boxShadow: '0 4px 16px rgba(0,0,0,0.08)', overflow: 'hidden'
+              background: COLORS.white, border: `1px solid ${COLORS.surface2}`,
+              borderRadius: RADIUS.sm, zIndex: 20,
+              boxShadow: SHADOW.card, overflow: 'hidden'
             }}>
               {SORT_OPTIONS.map(opt => (
                 <button key={opt} onClick={() => { setSortBy(opt); setShowSort(false) }} style={{
                   display: 'block', width: '100%', padding: '10px 16px',
                   textAlign: 'left', fontSize: '13px', fontWeight: sortBy === opt ? 600 : 400,
-                  color: sortBy === opt ? '#C96E8A' : '#2A1F2D',
-                  background: sortBy === opt ? '#F9ECF1' : '#fff',
+                  color: sortBy === opt ? COLORS.rose : COLORS.ink,
+                  background: sortBy === opt ? COLORS.roseLight : COLORS.white,
                   border: 'none', cursor: 'pointer',
-                  fontFamily: 'DM Sans, system-ui, sans-serif',
+                  fontFamily: FONTS.body,
                   borderBottom: '1px solid #FAF7F4',
                   whiteSpace: 'nowrap'
                 }}>{opt}</button>
@@ -358,43 +337,43 @@ const Events = () => {
         </div>
       </div>
 
-      {/* Results count */}
-      <div style={{ padding: '16px 16px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#2A1F2D', margin: 0, fontFamily: 'Playfair Display, Georgia, serif' }}>
+      {/* Results header */}
+      <div style={{ padding: `${SPACING.lg} ${SPACING.lg} ${SPACING.sm}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h2 style={SECTION_HEADER_STYLE}>
           {query ? `"${query}"` : activeCategory && activeCategory !== 'All' ? `${activeCategory} events` : 'All events'}
         </h2>
-        <span style={{ fontSize: '13px', color: '#7A6880', background: '#F4EFE9', padding: '4px 10px', borderRadius: '20px' }}>
+        <span style={{ fontSize: '13px', color: COLORS.muted, background: COLORS.surface, padding: '4px 10px', borderRadius: RADIUS.pill }}>
           {loading ? '...' : `${displayed.length} found`}
         </span>
       </div>
 
       {/* Event list */}
-      <div style={{ padding: '8px 16px 20px' }}>
+      <div style={{ padding: `${SPACING.sm} ${SPACING.lg} ${SPACING.xl}` }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <div style={{ fontSize: '36px', marginBottom: '10px' }}>✨</div>
-            <div style={{ color: '#7A6880', fontSize: '15px' }}>Loading events...</div>
+            <div style={{ fontSize: '36px', marginBottom: SPACING.md }}>✨</div>
+            <div style={{ color: COLORS.muted, fontSize: '15px' }}>Loading events...</div>
           </div>
         ) : displayed.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🔍</div>
-            <div style={{ color: '#2A1F2D', fontSize: '17px', fontWeight: 600, marginBottom: '6px' }}>No events found</div>
-            <div style={{ color: '#7A6880', fontSize: '14px', marginBottom: '16px' }}>Try a different search or filter</div>
+            <div style={{ fontSize: '40px', marginBottom: SPACING.md }}>🔍</div>
+            <div style={{ color: COLORS.ink, fontSize: '17px', fontWeight: 600, marginBottom: SPACING.sm }}>No events found</div>
+            <div style={{ color: COLORS.muted, fontSize: '14px', marginBottom: SPACING.lg }}>Try a different search or filter</div>
             <button onClick={() => { setQuery(''); setActiveFilter('') }} style={{
-              background: '#C96E8A', color: '#fff', border: 'none',
-              borderRadius: '50px', padding: '12px 28px', fontSize: '14px',
-              fontWeight: 600, cursor: 'pointer', fontFamily: 'DM Sans, system-ui, sans-serif'
+              background: COLORS.rose, color: COLORS.white, border: 'none',
+              borderRadius: RADIUS.pill, padding: '12px 28px', fontSize: '14px',
+              fontWeight: 600, cursor: 'pointer', fontFamily: FONTS.body
             }}>Clear filters</button>
           </div>
         ) : displayed.map(e => (
           <div key={`${e.source}-${e.id}`}>
             <EventCard event={e} />
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-8px', marginBottom: '14px', paddingRight: '4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-8px', marginBottom: SPACING.lg, paddingRight: SPACING.xs }}>
               <button onClick={() => openRating(e)} style={{
-                background: '#FAF0DC', color: '#D4A84B',
-                border: '1px solid #F0D8A0', borderRadius: '20px',
+                background: COLORS.goldLight, color: COLORS.gold,
+                border: '1px solid #F0D8A0', borderRadius: RADIUS.pill,
                 padding: '6px 14px', fontSize: '11px', fontWeight: 600,
-                cursor: 'pointer', fontFamily: 'DM Sans, system-ui, sans-serif',
+                cursor: 'pointer', fontFamily: FONTS.body,
                 display: 'flex', alignItems: 'center', gap: '4px'
               }}>⭐ Rate this event</button>
             </div>
